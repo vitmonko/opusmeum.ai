@@ -3,61 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Services</title>
+    <title>OPUSMEUM.ai - AI Services</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background: #f0f0f0;
+            color: #333;
             text-align: center;
         }
-        .hero {
-            background-color: #4A90E2;
-            color: white;
+        .container {
+            max-width: 1200px;
+            margin: auto;
             padding: 50px 20px;
         }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #000;
+        }
+        p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 10px auto 40px;
+            opacity: 0.8;
+        }
         .services {
-            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
         }
         .service {
-            margin: 20px 0;
+            background: #fff;
             padding: 20px;
-            background-color: #f4f4f4;
-            border-radius: 5px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            border: 1px solid #ccc;
+        }
+        .service:hover {
+            transform: translateY(-10px);
+            background: #e0e0e0;
         }
         .contact {
-            background-color: #222;
+            background: #333;
             color: white;
-            padding: 30px 20px;
+            padding: 20px;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <h1>Welcome to AI Services</h1>
-        <p>Innovative AI solutions for businesses and individuals</p>
+    <div class="container">
+        <h1>OPUSMEUM.ai - Innovative AI Services</h1>
+        <p>We provide cutting-edge AI solutions to enhance your business and daily operations.</p>
+        <div class="services">
+            <div class="service">
+                <h2>Machine Learning</h2>
+                <p>Empower your business with predictive analytics and intelligent decision-making.</p>
+            </div>
+            <div class="service">
+                <h2>Natural Language Processing</h2>
+                <p>Enhance communication with AI-driven text understanding and generation.</p>
+            </div>
+            <div class="service">
+                <h2>Computer Vision</h2>
+                <p>Enable automated image and video analysis with state-of-the-art AI models.</p>
+            </div>
+            <div class="service">
+                <h2>AI Chatbots</h2>
+                <p>Improve customer engagement with intelligent conversational agents.</p>
+            </div>
+        </div>
     </div>
-    
-    <div class="services">
-        <h2>Our Services</h2>
-        <div class="service">
-            <h3>Machine Learning</h3>
-            <p>Advanced ML models to optimize business processes.</p>
-        </div>
-        <div class="service">
-            <h3>AI Chatbots</h3>
-            <p>Automated assistants to enhance customer experience.</p>
-        </div>
-        <div class="service">
-            <h3>Data Analytics</h3>
-            <p>Powerful insights through AI-driven data analysis.</p>
-        </div>
-    </div>
-    
     <div class="contact">
         <h2>Contact Us</h2>
-        <p>Email: vitalijus@opusmeum.net</p>
-        <p>Phone: +37060065046</p>
+        <p>Email: contact@aiservices.com</p>
+        <p>Phone: +1 234 567 890</p>
+        <p>Address: 123 AI Street, Tech City, TX</p>
     </div>
 </body>
 </html>
