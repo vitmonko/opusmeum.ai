@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opus Meum</title>
+<meta name="description" content="Opus Meum">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .logo {
+    position: fixed; left: 50%; top: 50%; z-index: 1;
+    width: min(46vw, 420px);
+    transform: translate(-50%, -50%);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .logo svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .logo path { fill: none; stroke: #000; stroke-width: 86; }
+  @media (max-width: 600px) { .logo { width: 62vw; } }
+</style>
+</head>
+<body>
+<canvas id="net" aria-hidden="true"></canvas>
+<div class="logo" id="logo">
+  <svg viewBox="530 180 870 480" role="img" aria-label="Opus Meum">
+    <defs>
+      <mask id="c" maskUnits="userSpaceOnUse" x="500" y="150" width="1000" height="600">
+        <rect x="500" y="150" width="1000" height="600" fill="#fff"/>
+        <polygon points="876,360 1500,360 1500,900 1416,900" fill="#000"/>
+      </mask>
+      <clipPath id="t"><rect x="500" y="208" width="1000" height="600"/></clipPath>
+    </defs>
+    <path id="pO" mask="url(#c)" d="M 949.7 376.9 A 178 178 0 1 1 902.9 294.1"/>
+    <path id="pM" clip-path="url(#t)" stroke-miterlimit="10" d="M 897.9 289.1 L 1095 486 L 1323 222 L 1323 633"/>
+  </svg>
+</div>
+<script>
+(() => {
+  const cv = document.getElementById('net');
+  const ctx = cv.getContext('2d');
+  const logo = document.getElementById('logo');
+  const svg = logo.querySelector('svg');
+  const paths = [document.getElementById('pO'), document.getElementById('pM')];
+  const VB = { x: 530, y: 180, w: 870 };
+  const O_CENTER = { x: 777, y: 419.9 }; // centre of the O arc, radius 178 + half stroke 43 = 221
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  let W, H, dpr, unit, maxNodes, center;
+  let nodes = [], edges = [], pulses = [];
+  let active = false, alpha = 0, pulseClock = 0;
+  const mouse = { x: null, y: null };
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    unit = Math.max(20, Math.min(W, H) / 20);
+    maxNodes = Math.round(Math.min(900, Math.max(260, (W * H) / 2200)));
+    const r = svg.getBoundingClientRect();
+    center = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    clear();
+    if (active) seed();
+  }
+
+  function clear() { nodes = []; edges = []; pulses = []; }
+
+  // Logo coordinates (viewBox) to screen pixels.
+  function toScreen(p) {
+    const r = svg.getBoundingClientRect();
+    const s = r.width / VB.w;
+    return { x: r.left + (p.x - VB.x) * s, y: r.top + (p.y - VB.y) * s };
+  }
+
+  function addNode(x, y, depth, dir) {
+    const n = { x, y, depth, dir, out: [], alive: false, flash: 0, born: 0 };
+    nodes.push(n);
+    return n;
+  }
+
+  function addEdge(a, b, delay = 0) {
+    const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+    const e = { a, b, t: -delay, len, done: false };
+    edges.push(e);
+    a.out.push(e);
+    return e;
+  }
+
+  // Start the network at points spread along the two logo strokes.
+  function seed() {
+    const total = paths.reduce((s, p) => s + p.getTotalLength(), 0);
+    const count = 26;
+    for (let i = 0; i < count; i++) {
+      let d = (i + rand(0.15, 0.85)) / count * total;
+      let path = paths[0];
+      if (d > path.getTotalLength()) { d -= path.getTotalLength(); path = paths[1]; }
+      const q = path.getPointAtLength(d);
+      let p, dir;
+      if (path === paths[0]) {
+        // On the O: start at its outer edge and point away from its centre,
+        // so no line crosses the hole.
+        const a = Math.atan2(q.y - O_CENTER.y, q.x - O_CENTER.x);
+        p = toScreen({ x: O_CENTER.x + Math.cos(a) * 221, y: O_CENTER.y + Math.sin(a) * 221 });
+        dir = a + rand(-0.35, 0.35);
+      } else {
+        // On the M: start at the stroke's edge, growing out perpendicular to it.
+        const L = path.getTotalLength();
+        const q0 = path.getPointAtLength(Math.max(0, d - 2));
+        const q1 = path.getPointAtLength(Math.min(L, d + 2));
+        let nx = -(q1.y - q0.y), ny = q1.x - q0.x;
+        const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+        if (Math.random() < 0.5) { nx = -nx; ny = -ny; }
+        // Never grow through the O's hole: flip to the other side if this way would.
+        const hitsO = (sx, sy) => {
+          for (let k = 43; k < 520; k += 15) {
+            if (Math.hypot(q.x + sx * k - O_CENTER.x, q.y + sy * k - O_CENTER.y) < 150) return true;
+          }
+          return false;
+        };
+        if (hitsO(nx, ny)) { nx = -nx; ny = -ny; if (hitsO(nx, ny)) continue; }
+        p = toScreen({ x: q.x + nx * 43, y: q.y + ny * 43 });
+        dir = Math.atan2(ny, nx) + rand(-0.35, 0.35);
+      }
+      const root = addNode(p.x, p.y, 0, dir);
+      root.alive = true;
+      root.root = true;
+      branch(root, i * 0.04);
+    }
+  }
+
+  function nearest(x, y, radius, skip) {
+    let best = null, bd = radius;
+    for (const n of nodes) {
+      if (n === skip) continue;
+      const d = Math.hypot(n.x - x, n.y - y);
+      if (d < bd) { bd = d; best = n; }
+    }
+    return best;
+  }
+
+  // Grow children out of a node that has just come alive.
+  function branch(n, delay = 0) {
+    if (nodes.length >= maxNodes) return;
+    const q = Math.random();
+    const k = n.depth < 3 ? 2 : (q < 0.12 ? 3 : q < 0.7 ? 2 : q < 0.93 ? 1 : 0);
+    const outward = Math.atan2(n.y - center.y, n.x - center.x);
+    for (let i = 0; i < k; i++) {
+      let ang = n.dir + rand(-0.8, 0.8);
+      ang += angleDiff(outward, ang) * 0.25;
+      if (active && mouse.x !== null) {
+        const toMouse = Math.atan2(mouse.y - n.y, mouse.x - n.x);
+        ang += angleDiff(toMouse, ang) * 0.12;
+      }
+      // Roots sit on the logo, so their first edge reaches past its edge.
+      const len = n.root ? exitDist(n, ang) + unit * rand(0.35, 0.9) : unit * rand(0.7, 1.35);
+      const x = n.x + Math.cos(ang) * len;
+      const y = n.y + Math.sin(ang) * len;
+      if (x < -unit || x > W + unit || y < -unit || y > H + unit) continue;
+      if (insideLogo(x, y)) continue;
+      const near = nearest(x, y, unit * 0.5, n);
+      if (near) {
+        // Join an existing node instead of crowding it: a synapse.
+        if (!n.out.some(e => e.b === near)) addEdge(n, near, delay);
+        continue;
+      }
+      addEdge(n, addNode(x, y, n.depth + 1, ang), delay + rand(0, 0.15));
+    }
+    // Occasional sideways link to a neighbour, so it reads as a mesh.
+    if (n.depth > 0 && Math.random() < 0.3) {
+      const m = nearest(n.x + rand(-unit, unit), n.y + rand(-unit, unit), unit * 1.5, n);
+      if (m && m.alive && !n.out.some(e => e.b === m) && !m.out.some(e => e.b === n)) addEdge(n, m, delay + 0.1);
+    }
+  }
+
+  // Keep new growth out of the logo's own area so the mark stays clean.
+  function insideLogo(x, y) {
+    const r = svg.getBoundingClientRect();
+    const m = unit * 0.15;
+    return x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+  }
+
+  // Distance from a point inside the logo box to the box edge along an angle.
+  function exitDist(n, ang) {
+    const r = svg.getBoundingClientRect();
+    const cx = Math.cos(ang), cy = Math.sin(ang);
+    const tx = cx > 0 ? (r.right - n.x) / cx : cx < 0 ? (r.left - n.x) / cx : Infinity;
+    const ty = cy > 0 ? (r.bottom - n.y) / cy : cy < 0 ? (r.top - n.y) / cy : Infinity;
+    return Math.max(0, Math.min(tx, ty));
+  }
+
+  function angleDiff(a, b) {
+    let d = (a - b) % TAU;
+    if (d > Math.PI) d -= TAU;
+    if (d < -Math.PI) d += TAU;
+    return d;
+  }
+
+  function update(dt) {
+    alpha += (active ? 3 : -1.8) * dt;
+    alpha = Math.max(0, Math.min(1, alpha));
+    if (!active && alpha === 0 && nodes.length) clear();
+
+    if (active) {
+      const speed = unit * 3.2;
+      for (let i = 0; i < edges.length; i++) {
+        const e = edges[i];
+        if (e.done) continue;
+        e.t += dt * speed / e.len;
+        if (e.t >= 1) {
+          e.t = 1; e.done = true;
+          if (!e.b.alive) { e.b.alive = true; e.b.flash = 1; branch(e.b); }
+        }
+      }
+    }
+
+    for (const n of nodes) n.flash = Math.max(0, n.flash - dt * 2.2);
+
+    // Signals travelling outward along grown edges.
+    if (!reduce && alpha > 0.3) {
+      pulseClock -= dt;
+      if (pulseClock <= 0 && pulses.length < 70) {
+        pulseClock = 0.06;
+        const roots = nodes.filter(n => n.root);
+        const r = roots[(Math.random() * roots.length) | 0];
+        const opts = r ? r.out.filter(e => e.done) : [];
+        if (opts.length) pulses.push({ e: opts[(Math.random() * opts.length) | 0], p: 0 });
+      }
+    }
+    const pspeed = unit * 7;
+    pulses = pulses.filter(pl => {
+      pl.p += dt * pspeed / pl.e.len;
+      if (pl.p < 1) return true;
+      const n = pl.e.b;
+      n.flash = 1;
+      const next = n.out.filter(e => e.done);
+      if (!next.length) return false;
+      pl.e = next[(Math.random() * next.length) | 0];
+      pl.p = 0;
+      return true;
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    if (alpha <= 0) return;
+    ctx.globalAlpha = alpha;
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(0,0,0,0.28)';
+    ctx.beginPath();
+    for (const e of edges) {
+      if (e.t <= 0) continue;
+      ctx.moveTo(e.a.x, e.a.y);
+      ctx.lineTo(e.a.x + (e.b.x - e.a.x) * e.t, e.a.y + (e.b.y - e.a.y) * e.t);
+    }
+    ctx.stroke();
+
+    ctx.fillStyle = '#000';
+    for (const n of nodes) {
+      if (!n.alive || n.root) continue;
+      const r = 1.6 + n.flash * 2.2;
+      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, TAU); ctx.fill();
+      if (n.flash > 0.05) {
+        ctx.strokeStyle = `rgba(0,0,0,${n.flash * 0.35})`;
+        ctx.beginPath(); ctx.arc(n.x, n.y, r + (1 - n.flash) * 9, 0, TAU); ctx.stroke();
+      }
+    }
+
+    for (const pl of pulses) {
+      const e = pl.e;
+      const x = e.a.x + (e.b.x - e.a.x) * pl.p;
+      const y = e.a.y + (e.b.y - e.a.y) * pl.p;
+      const tx = e.a.x + (e.b.x - e.a.x) * Math.max(0, pl.p - 0.35);
+      const ty = e.a.y + (e.b.y - e.a.y) * Math.max(0, pl.p - 0.35);
+      ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(x, y); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, 2, 0, TAU); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function start() {
+    if (active) return;
+    active = true;
+    if (!nodes.length) seed();
+    if (reduce) { for (let i = 0; i < 400; i++) update(0.1); }
+  }
+  function stop() { active = false; }
+
+  logo.addEventListener('pointerenter', e => { if (e.pointerType !== 'touch') start(); });
+  logo.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch') stop(); });
+  logo.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') active ? stop() : start(); });
+  addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  addEventListener('resize', resize);
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    update(dt);
+    draw();
+    requestAnimationFrame(frame);
+  }
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
