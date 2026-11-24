@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Governance Monitor for SharePoint and Teams | Opus Meum</title>
-<meta name="description" content="A SharePoint and Teams governance monitor that runs on standard Microsoft 365 licences. 17 checks for ownerless, inactive and overshared sites, owner reviews in Teams, data kept in your tenant.">
+<title>Governance Monitor for SharePoint, Power Apps and agents | Opus Meum</title>
+<meta name="description" content="A governance monitor for SharePoint, Power Apps, Power Automate and Copilot agents that runs on standard Microsoft 365 licences, with more controls for tenants that have premium licences.">
 <meta name="page-type" content="software">
 <meta name="site-kind" content="software">
-<meta property="og:title" content="Governance Monitor for SharePoint and Teams | Opus Meum">
-<meta property="og:description" content="17 checks for ownerless, inactive and overshared sites. Runs on standard Microsoft 365 licences. In development, pilot tenants wanted.">
+<meta property="og:title" content="Governance Monitor for SharePoint, Power Apps and agents | Opus Meum">
+<meta property="og:description" content="Finds ownerless, inactive and overshared sites, apps, flows and agents. Runs on standard Microsoft 365 licences. In development, pilot tenants wanted.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://vitmonko.github.io/opusmeum.ai/governance-monitor/">
 <meta name="theme-color" content="#ffffff">
@@ -28,7 +28,8 @@
     <nav class="pnav" aria-label="Page">
       <a href="#checks">Checks</a>
       <a href="#how">How it runs</a>
-      <a href="#owners">Owner reviews</a>
+      <a href="#power-platform">Power Platform</a>
+      <a href="#premium">Premium</a>
       <a class="btn btn-solid btn-sm" href="mailto:vitalijus@opusmeum.net?subject=Governance%20Monitor%20pilot">Request pilot access</a>
     </nav>
   </div>
@@ -41,9 +42,9 @@
     <div class="wrap">
       <div class="hero-copy">
         <p class="status"><span class="dot" aria-hidden="true"></span>In development, pilot tenants wanted</p>
-        <h1>Governance monitor for SharePoint and Teams</h1>
-        <p class="lede">Finds ownerless, inactive and overshared sites every night, asks owners what they still need, and runs on the Microsoft 365 licences you already have.</p>
-        <p class="fact">17 checks. No premium Power Platform licences.</p>
+        <h1>Governance monitor for SharePoint, Power Apps and agents</h1>
+        <p class="lede">Finds ownerless, inactive and overshared sites, apps, flows and agents every night, asks owners what they still need, and runs on the Microsoft 365 licences you already have.</p>
+        <p class="fact">No premium licences needed. Premium licences add more controls.</p>
         <div class="actions">
           <a class="btn btn-solid" href="mailto:vitalijus@opusmeum.net?subject=Governance%20Monitor%20pilot">Request pilot access</a>
           <a class="btn btn-line" href="../sharepoint-governance/">Take the SharePoint check</a>
@@ -166,6 +167,60 @@
         </div>
         <button class="btn btn-text pause" type="button" aria-pressed="false" id="pause">Pause animation</button>
       </div>
+    </div>
+  </section>
+
+  <!-- Power Platform and agents on standard licences -->
+  <section class="sec" id="power-platform">
+    <div class="wrap split">
+      <div>
+        <h2>Power Apps, flows and agents in the same view</h2>
+        <p class="sub">One nightly flow reads the Power Platform inventory with the standard Power Platform for Admins connector. It needs no premium licence.</p>
+        <ul class="ticks">
+          <li>Every app, cloud flow and Copilot Studio or Agent Builder agent</li>
+          <li>Owners who have left, and items with a single owner</li>
+          <li>Apps and flows unused for 90 days, and flows that keep failing</li>
+          <li>Apps shared with the whole organisation, and business apps in the default environment</li>
+          <li>The connectors each item uses, checked against your data policies</li>
+        </ul>
+      </div>
+      <div class="app-frame" role="img" aria-label="Inventory view with an app, a flow and two agents, each with its owner and a finding">
+        <div class="app-bar"><i></i><i></i><i></i><span>Governance Monitor, Power Platform</span></div>
+        <div class="app-main" aria-hidden="true">
+          <div class="tiles">
+            <div><span class="k">Apps</span><b>186</b></div>
+            <div><span class="k">Flows</span><b>412</b></div>
+            <div><span class="k">Agents</span><b>37</b></div>
+            <div><span class="k">Owner left</span><b>19</b></div>
+          </div>
+          <div class="rows">
+            <div class="row head"><span>Item</span><span>Finding</span><span>Severity</span></div>
+            <div class="row"><span><em class="type">App</em>Expense Claims</span><span>Shared with everyone, default environment</span><span class="sev high">High</span></div>
+            <div class="row"><span><em class="type">Flow</em>Invoice to Dropbox</span><span>Sends files to a personal service</span><span class="sev crit">Critical</span></div>
+            <div class="row"><span><em class="type">Agent</em>HR Policy Helper</span><span>Owner account disabled</span><span class="sev high">High</span></div>
+            <div class="row"><span><em class="type">Agent</em>Sales Q&amp;A</span><span>No use for 120 days</span><span class="sev med">Medium</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Premium governance -->
+  <section class="sec" id="premium">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>More controls with premium licences</h2>
+        <p>Everything above works on standard Microsoft 365 licences. If your tenant has premium licences, the monitor also uses the governance features that come with them.</p>
+      </div>
+      <div class="compare" role="table" aria-label="What the monitor does on standard and on premium licences">
+        <div class="crow chead" role="row"><span role="columnheader">Feature</span><span role="columnheader">Standard</span><span role="columnheader">Premium</span></div>
+        <div class="crow" role="row"><span role="cell">SharePoint, Power Platform and agent checks, owner reviews in Teams</span><span role="cell" class="yes">Included</span><span role="cell" class="yes">Included</span></div>
+        <div class="crow" role="row"><span role="cell">Sharing limits, weekly usage insights, solution checker and IP firewall per environment<small>Managed Environments, with Power Apps, Power Automate or Copilot Studio licences</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
+        <div class="crow" role="row"><span role="cell">Agents built outside Power Platform: Teams, SharePoint, Foundry and others<small>Microsoft Graph agent APIs, with an Agent 365 licence</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
+        <div class="crow" role="row"><span role="cell">SharePoint Advanced Management oversharing reports<small>With at least one Microsoft 365 Copilot licence in the tenant</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
+        <div class="crow" role="row"><span role="cell">Automatic fixes through Microsoft Graph and history kept in Dataverse<small>Power Automate Premium for the monitor's service account only</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
+      </div>
+      <p class="note">In a Managed Environment, everyone who uses its apps and flows needs a premium licence, so the monitor tells you which environments qualify before you switch it on.</p>
     </div>
   </section>
 
