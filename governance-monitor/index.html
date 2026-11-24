@@ -27,7 +27,7 @@
     <a class="brand" href="../"><svg viewBox="530 180 870 480" aria-hidden="true" focusable="false"><defs><mask id="c" maskUnits="userSpaceOnUse" x="500" y="150" width="1000" height="600"><rect x="500" y="150" width="1000" height="600" fill="#fff"/><polygon points="876,360 1500,360 1500,900 1416,900" fill="#000"/></mask><clipPath id="t"><rect x="500" y="208" width="1000" height="600"/></clipPath></defs><path mask="url(#c)" d="M 949.7 376.9 A 178 178 0 1 1 902.9 294.1"/><path clip-path="url(#t)" stroke-miterlimit="10" d="M 897.9 289.1 L 1095 486 L 1323 222 L 1323 633"/></svg><span>Opus Meum</span></a>
     <nav class="pnav" aria-label="Page">
       <a href="#checks">Checks</a>
-      <a href="#how">How it runs</a>
+      <a href="#reports">Reports</a>
       <a href="#power-platform">Power Platform</a>
       <a href="#premium">Premium</a>
       <a class="btn btn-solid btn-sm" href="mailto:vitalijus@opusmeum.net?subject=Governance%20Monitor%20pilot">Request pilot access</a>
@@ -170,6 +170,42 @@
     </div>
   </section>
 
+  <!-- Changes, deadlines, exceptions, owners -->
+  <section class="sec" id="changes">
+    <div class="wrap split">
+      <div>
+        <h2>Changes, deadlines and exceptions</h2>
+        <p class="sub">Every scan is compared with the last one, and every finding gets an owner and a due date.</p>
+        <ul class="mini">
+          <li><h3>Shows permission changes</h3><p>New guests, groups and broad grants on each site since the last scan.</p></li>
+          <li><h3>Tracks fix deadlines</h3><p>Due dates by severity, with reminders to the owner and then their manager.</p></li>
+          <li><h3>Expires risk exceptions</h3><p>Each exception has an approver and an end date. Then the finding reopens.</p></li>
+          <li><h3>Splits business and technical owners</h3><p>Business owners confirm a site is needed. Technical owners fix its settings.</p></li>
+        </ul>
+      </div>
+      <div class="app-frame" role="img" aria-label="Permission changes on the Finance Contracts site since the last scan, with a fix due in 5 days">
+        <div class="app-bar"><i></i><i></i><i></i><span>Changes since last scan</span></div>
+        <div class="app-main" aria-hidden="true">
+          <div class="site-line">
+            <div><span class="k">Site</span><b>Finance Contracts</b></div>
+            <span class="due">Fix due in 5 days</span>
+          </div>
+          <div class="owners">
+            <div><span class="k">Business owner</span><b>Head of Finance</b></div>
+            <div><span class="k">Technical owner</span><b>IT, Collaboration team</b></div>
+          </div>
+          <div class="rows diff">
+            <div class="row add"><span>Everyone except external users</span><span>Read access granted</span><span class="sev crit">Critical</span></div>
+            <div class="row add"><span>2 guests</span><span>Added to Members</span><span class="sev high">High</span></div>
+            <div class="row add"><span>Anyone link</span><span>Created on 3 files</span><span class="sev high">High</span></div>
+            <div class="row del"><span>Second owner</span><span>Removed, account disabled</span><span class="sev med">Medium</span></div>
+          </div>
+          <div class="exc"><span class="k">Exception</span><span>Anyone links on the Price list folder, approved by the Head of Finance until 31 March</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Power Platform and agents on standard licences -->
   <section class="sec" id="power-platform">
     <div class="wrap split">
@@ -205,6 +241,40 @@
     </div>
   </section>
 
+  <!-- Reports, trends, readiness, evidence -->
+  <section class="sec" id="reports">
+    <div class="wrap split">
+      <div>
+        <h2>Reports for management and auditors</h2>
+        <p class="sub">The monitor keeps the history, so you can show progress and prove reviews happened.</p>
+        <ul class="mini">
+          <li><h3>Sends a monthly management report</h3><p>Score, top risks and overdue fixes as a PDF and an email. No Power BI licence.</p></li>
+          <li><h3>Keeps a risk trend</h3><p>Tenant and area scores every day, and each site's score every month.</p></li>
+          <li><h3>Measures Copilot readiness</h3><p>Your self-check answers next to what the scan measured.</p></li>
+          <li><h3>Keeps review evidence</h3><p>Each month's reviews and fixes saved to a locked library with a retention label.</p></li>
+        </ul>
+      </div>
+      <div class="app-frame" role="img" aria-label="Monthly report with a tenant score trend rising from 48 to 71 over twelve months, and Copilot readiness of 78 percent answered against 54 percent measured">
+        <div class="app-bar"><i></i><i></i><i></i><span>Monthly governance report</span></div>
+        <div class="app-main" aria-hidden="true">
+          <div class="score-row">
+            <div><span class="k">Tenant health, 12 months</span><span class="score">71<small>/100</small></span></div>
+            <span class="trend">+23 since last year</span>
+          </div>
+          <div class="chart">
+            <span style="--v:.48"></span><span style="--v:.50"></span><span style="--v:.49"></span><span style="--v:.53"></span><span style="--v:.55"></span><span style="--v:.58"></span><span style="--v:.57"></span><span style="--v:.61"></span><span style="--v:.64"></span><span style="--v:.66"></span><span style="--v:.69"></span><span style="--v:.71"></span>
+          </div>
+          <div class="ready">
+            <span class="k">Copilot readiness</span>
+            <div class="rbar"><span>Self-check answers</span><i style="--v:.78"></i><b>78%</b></div>
+            <div class="rbar"><span>Measured by the scan</span><i style="--v:.54"></i><b>54%</b></div>
+          </div>
+          <div class="evid"><span class="k">Review evidence</span><span>October reviews: 212 of 230 answered, PDF saved to the Governance records library</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Premium governance -->
   <section class="sec" id="premium">
     <div class="wrap">
@@ -214,11 +284,14 @@
       </div>
       <div class="compare" role="table" aria-label="What the monitor does on standard and on premium licences">
         <div class="crow chead" role="row"><span role="columnheader">Feature</span><span role="columnheader">Standard</span><span role="columnheader">Premium</span></div>
-        <div class="crow" role="row"><span role="cell">SharePoint, Power Platform and agent checks, owner reviews in Teams</span><span role="cell" class="yes">Included</span><span role="cell" class="yes">Included</span></div>
+        <div class="crow" role="row"><span role="cell">SharePoint, Power Platform and agent checks, owner reviews, deadlines, exceptions, change tracking, PDF reports and review evidence</span><span role="cell" class="yes">Included</span><span role="cell" class="yes">Included</span></div>
         <div class="crow" role="row"><span role="cell">Sharing limits, weekly usage insights, solution checker and IP firewall per environment<small>Managed Environments, with Power Apps, Power Automate or Copilot Studio licences</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
         <div class="crow" role="row"><span role="cell">Agents built outside Power Platform: Teams, SharePoint, Foundry and others<small>Microsoft Graph agent APIs, with an Agent 365 licence</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
         <div class="crow" role="row"><span role="cell">SharePoint Advanced Management oversharing reports<small>With at least one Microsoft 365 Copilot licence in the tenant</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
         <div class="crow" role="row"><span role="cell">Automatic fixes through Microsoft Graph and history kept in Dataverse<small>Power Automate Premium for the monitor's service account only</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
+        <div class="crow" role="row"><span role="cell">Who changed a permission, from the Purview audit log<small>An app registration and the premium HTTP connector</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
+        <div class="crow" role="row"><span role="cell">Management reports in Power BI<small>Power BI Pro for everyone who opens them</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
+        <div class="crow" role="row"><span role="cell">Fix tickets in ServiceNow or Jira<small>Premium connectors for the service account</small></span><span role="cell" class="no">Not available</span><span role="cell" class="yes">Included</span></div>
       </div>
       <p class="note">In a Managed Environment, everyone who uses its apps and flows needs a premium licence, so the monitor tells you which environments qualify before you switch it on.</p>
     </div>
